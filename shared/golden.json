@@ -1,0 +1,88 @@
+{
+  "$comment": "Uji acuan PRD v4 Bagian 12.2 (P Rp3.000.000, T 90 hari, I Rp4.000.000, K Rp300.000, n 3). Dipakai tes frontend (Vitest) dan backend (pytest). Data contoh, bukan penawaran penyelenggara nyata.",
+  "tanggal_acuan": "2026-10-05",
+  "kasus": [
+    {
+      "nama": "A",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.3, "admin_persen": 5, "penghasilan": 4000000, "cicilan_lain": 300000, "segmen": "konsumtif_mikro" },
+      "harapan": { "bunga": 810000, "admin": 150000, "diterima": 2850000, "total": 3810000, "biaya": 960000, "jumlah_cicilan": 3, "cicilan": 1270000, "rasio_sendiri_persen": 31.75, "rasio_persen": 39.25, "efektif_harian_persen": 0.3556, "di_atas_patokan": true, "status_batas": "atas_jika_admin" },
+      "tampilan": { "diterima": "Rp2.850.000", "total": "Rp3.810.000", "biaya": "Rp960.000", "cicilan": "Rp1.270.000", "rasio_sendiri": "31,8%", "rasio": "39,3%", "efektif": "0,356%" }
+    },
+    {
+      "nama": "B",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.1, "admin_persen": 2, "penghasilan": 4000000, "cicilan_lain": 300000, "segmen": "konsumtif_mikro" },
+      "harapan": { "bunga": 270000, "admin": 60000, "diterima": 2940000, "total": 3270000, "biaya": 330000, "jumlah_cicilan": 3, "cicilan": 1090000, "rasio_sendiri_persen": 27.25, "rasio_persen": 34.75, "efektif_harian_persen": 0.1222, "di_atas_patokan": true, "status_batas": "bawah_keduanya" },
+      "tampilan": { "diterima": "Rp2.940.000", "total": "Rp3.270.000", "biaya": "Rp330.000", "cicilan": "Rp1.090.000", "rasio_sendiri": "27,3%", "rasio": "34,8%", "efektif": "0,122%" }
+    },
+    {
+      "nama": "C",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.2, "admin_persen": 3, "penghasilan": 4000000, "cicilan_lain": 300000, "segmen": "konsumtif_mikro" },
+      "harapan": { "bunga": 540000, "admin": 90000, "diterima": 2910000, "total": 3540000, "biaya": 630000, "jumlah_cicilan": 3, "cicilan": 1180000, "rasio_sendiri_persen": 29.5, "rasio_persen": 37.0, "efektif_harian_persen": 0.2333, "di_atas_patokan": true, "status_batas": "bawah_keduanya" },
+      "tampilan": { "diterima": "Rp2.910.000", "total": "Rp3.540.000", "biaya": "Rp630.000", "cicilan": "Rp1.180.000", "rasio_sendiri": "29,5%", "rasio": "37%", "efektif": "0,233%" }
+    }
+  ],
+  "uji_tekanan": {
+    "nama": "Uji tekanan penawaran B, K = 300.000",
+    "penghasilan": 4000000,
+    "total_cicilan": 1390000,
+    "rasio_persen": [34.75, 38.61, 43.44, 49.64, 57.92]
+  },
+  "kontrastif_rasio": { "kasus": "B", "selisih_poin": 7.5 },
+  "kontrastif_penawaran": { "murah": "B", "mahal": "C", "selisih_biaya": 300000, "selisih_bunga": 270000, "selisih_admin": 30000 },
+  "kontrafaktual": {
+    "kasus": "B",
+    "pokok_maks_mentah": 2477064.22,
+    "pokok_maks": 2477000,
+    "cicilan_lain_maks": 110000,
+    "penghasilan_min_mentah": 4633333.33,
+    "penghasilan_min": 4634000,
+    "rasio_dengan_pokok_maks": 29.9994
+  },
+  "tepi": [
+    {
+      "nama": "penghasilan kosong: rasio tidak dapat dihitung",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.3, "admin_persen": 5, "penghasilan": null, "cicilan_lain": 0 },
+      "harapan": { "rasio_persen": null, "rasio_sendiri_persen": null, "di_atas_patokan": null }
+    },
+    {
+      "nama": "penghasilan nol: rasio tidak dapat dihitung",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.3, "admin_persen": 5, "penghasilan": 0, "cicilan_lain": 0 },
+      "harapan": { "rasio_persen": null, "di_atas_patokan": null }
+    },
+    {
+      "nama": "tenor 15 hari: satu kali bayar",
+      "masukan": { "pokok": 1000000, "tenor": 15, "bunga_harian_persen": 0.3, "admin_persen": 0, "penghasilan": 4000000, "cicilan_lain": 0 },
+      "harapan": { "jumlah_cicilan": 1, "bunga": 45000, "total": 1045000, "cicilan": 1045000 }
+    },
+    {
+      "nama": "tenor 200 hari: n 7, batas memakai baris tenor lebih dari 6 bulan",
+      "masukan": { "pokok": 5000000, "tenor": 200, "bunga_harian_persen": 0.25, "admin_persen": 2, "penghasilan": 8000000, "cicilan_lain": 500000 },
+      "harapan": { "jumlah_cicilan": 7, "batas_tipe": "rentang", "status_batas": "atas_bunga" }
+    },
+    {
+      "nama": "tenor 200 hari di dalam rentang batas: belum pasti",
+      "masukan": { "pokok": 5000000, "tenor": 200, "bunga_harian_persen": 0.15, "admin_persen": 0, "penghasilan": 8000000, "cicilan_lain": 0 },
+      "harapan": { "batas_tipe": "rentang", "status_batas": "belum_pasti" }
+    },
+    {
+      "nama": "produktif: batas 0,1%, efektif dengan admin di atas",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.1, "admin_persen": 2, "penghasilan": 4000000, "cicilan_lain": 0, "segmen": "produktif" },
+      "harapan": { "batas_persen": 0.1, "status_batas": "atas_jika_admin" }
+    },
+    {
+      "nama": "konsumtif kecil dan menengah: batas 0,275%",
+      "masukan": { "pokok": 3000000, "tenor": 90, "bunga_harian_persen": 0.28, "admin_persen": 0, "penghasilan": 4000000, "cicilan_lain": 0, "segmen": "konsumtif_kecil" },
+      "harapan": { "batas_persen": 0.275, "status_batas": "atas_bunga" }
+    },
+    {
+      "nama": "pokok nol: hasil tidak ditampilkan",
+      "masukan": { "pokok": 0, "tenor": 90, "bunga_harian_persen": 0.3, "admin_persen": 5, "penghasilan": 4000000, "cicilan_lain": 0 },
+      "harapan": null
+    },
+    {
+      "nama": "tenor nol: hasil tidak ditampilkan",
+      "masukan": { "pokok": 3000000, "tenor": 0, "bunga_harian_persen": 0.3, "admin_persen": 5, "penghasilan": 4000000, "cicilan_lain": 0 },
+      "harapan": null
+    }
+  ]
+}

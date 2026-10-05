@@ -1,0 +1,79 @@
+{
+  "$comment": "Parameter regulasi berversi (PRD v4 Bagian 12.1). Ubah atau tambah versi di sini; kode tidak perlu diubah. Setiap parameter wajib punya sumber dan status. Parameter tanpa sumber berstatus nonaktif dan tidak dipakai. Menerbitkan versi baru membutuhkan dua orang (pengaju dan peninjau berbeda).",
+  "kanal_pengaduan": {
+    "nama": "Kontak OJK 157",
+    "telepon": "157",
+    "whatsapp": "081157157157",
+    "email": "konsumen@ojk.go.id",
+    "url": "https://kontak157.ojk.go.id",
+    "status": "terverifikasi"
+  },
+  "versi": [
+    {
+      "id": "2026.10.1",
+      "berlaku_mulai": "2025-05-20",
+      "diterbitkan": "2026-10-02",
+      "status": "terbit",
+      "pengaju": "Penyunting (contoh)",
+      "penyetuju": "Peninjau (contoh)",
+      "segmen": [
+        { "id": "konsumtif_mikro", "jenis": "konsumtif", "label": "Konsumtif mikro dan ultramikro" },
+        { "id": "konsumtif_kecil", "jenis": "konsumtif", "label": "Konsumtif kecil dan menengah" },
+        { "id": "produktif", "jenis": "produktif", "label": "Produktif" }
+      ],
+      "batas_harian": [
+        {
+          "id": "konsumtif_mikro_maks6",
+          "segmen": "konsumtif_mikro",
+          "tenor_maks_hari": 180,
+          "persen": 0.3,
+          "sumber": "SP OJK 76/OJK/GKPB/V/2025 (20 Mei 2025)",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "konsumtif_kecil_maks6",
+          "segmen": "konsumtif_kecil",
+          "tenor_maks_hari": 180,
+          "persen": 0.275,
+          "sumber": "SP OJK 76/OJK/GKPB/V/2025 (20 Mei 2025)",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "produktif_maks6",
+          "segmen": "produktif",
+          "tenor_maks_hari": 180,
+          "persen": 0.1,
+          "sumber": "SP OJK 76/OJK/GKPB/V/2025 (20 Mei 2025)",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "semua_lebih6",
+          "segmen": "semua",
+          "tenor_maks_hari": null,
+          "persen_min": 0.1,
+          "persen_maks": 0.2,
+          "sumber": "SP OJK 76/OJK/GKPB/V/2025; pemetaan segmen belum pasti",
+          "status": "perlu_data"
+        }
+      ],
+      "admin_termasuk_batas": {
+        "nilai": null,
+        "sumber": "Perlu teks ketentuan",
+        "status": "perlu_data",
+        "catatan": "Belum diketahui apakah batas harian termasuk biaya admin. Tampilkan dua angka (bunga saja dan efektif) sampai jelas."
+      },
+      "patokan_rasio": {
+        "persen": 30,
+        "sumber": "CNN Indonesia, 12 Januari 2026 (\"diperketat menjadi 30 persen pada 2026\")",
+        "status": "asumsi",
+        "cakupan_status": "perlu_data",
+        "catatan": "Patokan, bukan batas hukum. Cakupan (seluruh kreditur atau per penyelenggara) masih diverifikasi."
+      },
+      "nonaktif": [
+        { "nama": "Batas total manfaat 100% dari pokok", "alasan": "Tidak terverifikasi, dibuang pada v4" },
+        { "nama": "Rasio cicilan 40% pada 2025", "alasan": "Tidak terverifikasi, dibuang pada v4" },
+        { "nama": "SEOJK 19/SEOJK.06/2025 (syarat 18 tahun dan penghasilan Rp3.000.000)", "alasan": "Belum diverifikasi ulang terhadap teks resmi; tidak dipakai sebagai sumber parameter" }
+      ]
+    }
+  ]
+}

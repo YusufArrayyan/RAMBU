@@ -1,0 +1,10 @@
+node_modules
+**/node_modules
+**/.venv
+frontend/dist
+backend/*.db
+backend/.env
+backend/.keys
+backend/.pytest_cache
+.git
+assets

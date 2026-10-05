@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/.env
+backend/*.db
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Misc
+.DS_Store
+Thumbs.db
+assets/_preview.png
+.impeccable/
+
+# Kunci enkripsi pengembangan (dibuat otomatis)
+backend/.keys/
+
+# Uji ujung ke ujung
+backend/e2e.db
+frontend/test-results/
+frontend/playwright-report/
+
+# Konfigurasi lokal alat pengembangan
+.claude/

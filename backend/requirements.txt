@@ -1,0 +1,14 @@
+fastapi>=0.136,<1
+uvicorn[standard]>=0.49
+sqlalchemy>=2.0.41,<3
+pydantic>=2.13,<3
+python-multipart>=0.0.20
+pillow>=12
+anthropic>=0.70
+python-dotenv>=1.0
+cryptography>=44
+pywebpush>=2
+tzdata>=2024.1  # zona waktu IANA di Windows (NFR-09)
+# pengujian
+pytest>=9
+httpx>=0.28

@@ -1,0 +1,21 @@
+services:
+  rambu:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: backend/.env
+        required: false
+    environment:
+      RAMBU_CORS_ORIGINS: http://localhost:8000
+      RAMBU_APP_URL: http://localhost:8000
+      # Kunci yang dibuat otomatis disimpan di volume agar tetap sama setelah kontainer dibuat ulang.
+      # Untuk produksi sungguhan, set RAMBU_ENV=production dan isi RAMBU_SECRET_KEY serta
+      # RAMBU_VAPID_PRIVATE_KEY di backend/.env.
+      RAMBU_KEYS_DIR: /data/keys
+    volumes:
+      - rambu-data:/data
+    restart: unless-stopped
+
+volumes:
+  rambu-data:
