@@ -18,6 +18,7 @@ COPY backend ./backend
 COPY --from=web /app/frontend/dist ./frontend/dist
 RUN useradd --create-home rambu && mkdir -p /data && chown rambu /data
 USER rambu
-ENV RAMBU_DATABASE_URL=sqlite:////data/rambu.db
+ENV RAMBU_DATABASE_URL=sqlite:////data/rambu.db RAMBU_KEYS_DIR=/data/keys
 EXPOSE 8000
-CMD ["python", "-m", "uvicorn", "app.main:app", "--app-dir", "backend", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+# PORT diisi platform (Render, Railway, dsb.); bawaan 8000.
+CMD ["sh", "-c", "python -m uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

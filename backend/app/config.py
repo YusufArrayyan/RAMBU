@@ -53,7 +53,8 @@ class Settings:
     # Folder kunci yang dibuat otomatis (enkripsi data akun, VAPID). Di Docker: volume /data.
     keys_dir: str = _env("RAMBU_KEYS_DIR", str(ROOT / "backend" / ".keys"))
     akun_enabled: bool = _env("RAMBU_AKUN_ENABLED", "true").lower() in {"1", "true", "yes"}
-    app_url: str = _env("RAMBU_APP_URL", "http://localhost:5173")
+    # Alamat publik aplikasi (tautan masuk, pengingat). Di Render terisi otomatis dari RENDER_EXTERNAL_URL.
+    app_url: str = _env("RAMBU_APP_URL", os.getenv("RENDER_EXTERNAL_URL") or "http://localhost:5173")
     smtp_host: str = _env("RAMBU_SMTP_HOST", "")
     smtp_port: int = int(_env("RAMBU_SMTP_PORT", "587"))
     smtp_user: str = _env("RAMBU_SMTP_USER", "")
@@ -65,6 +66,9 @@ class Settings:
     vapid_subject: str = _env("RAMBU_VAPID_SUBJECT", "mailto:tim@rambu.local")
     # Data contoh untuk panel admin (hanya pengembangan): admin dan versi parameter rekaan.
     seed_contoh: bool = _env("RAMBU_SEED_CONTOH", "true").lower() in {"1", "true", "yes"}
+    # Demo publik: token admin contoh menjadi "contoh-<peran>-<rahasia>" agar tidak bisa ditebak
+    # dari repositori. Kosong (lokal): token tetap "contoh-<peran>".
+    seed_token_rahasia: str = _env("RAMBU_SEED_TOKEN_RAHASIA", "")
 
     @property
     def produksi(self) -> bool:

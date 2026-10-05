@@ -1,0 +1,34 @@
+# Blueprint Render untuk demo publik RAMBU (paket gratis, HTTPS otomatis).
+# Render: New > Blueprint > pilih repositori ini. Isi GEMINI_API_KEY saat diminta.
+#
+# Catatan paket gratis: layanan tidur setelah 15 menit tanpa kunjungan (bangun ~1 menit), dan
+# disk tidak permanen: akun demo, data admin, dan analitik kembali ke awal setiap kali layanan
+# dibuat ulang. Mode tamu tidak terpengaruh karena datanya ada di perangkat pengguna.
+services:
+  - type: web
+    name: rambu
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Demo: tanpa layanan email, kode masuk ditampilkan di layar (berlabel "Mode pengembangan").
+      # Untuk rilis sungguhan: RAMBU_ENV=production, isi RAMBU_SMTP_* dan RAMBU_VAPID_PRIVATE_KEY.
+      - key: RAMBU_ENV
+        value: development
+      - key: RAMBU_SECRET_KEY
+        generateValue: true
+      - key: RAMBU_SEED_CONTOH
+        value: "true"
+      # Token admin demo menjadi contoh-<peran>-<nilai ini>. Lihat nilainya di dashboard Render.
+      - key: RAMBU_SEED_TOKEN_RAHASIA
+        generateValue: true
+      - key: RAMBU_AI_ENABLED
+        value: "true"
+      - key: RAMBU_AI_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: RAMBU_GEMINI_MODEL
+        value: gemini-flash-latest

@@ -42,6 +42,8 @@ def seed(db: Session) -> None:
         return
     if not db.scalar(select(func.count(AdminRAMBU.id))):
         for nama, email, peran, token in ADMIN_CONTOH:
+            if settings.seed_token_rahasia:
+                token = f"{token}-{settings.seed_token_rahasia}"
             db.add(AdminRAMBU(nama=nama, email=email, peran=peran, token_hash=hash_hmac(token, "admin")))
         db.flush()
     if not db.scalar(select(func.count(KontenKlausul.id))):
