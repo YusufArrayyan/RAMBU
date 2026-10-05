@@ -1,5 +1,7 @@
 # RAMBU · Rujukan Analisis Mampu Bayar dan Utang
 
+[![CI](https://github.com/YusufArrayyan/RAMBU/actions/workflows/ci.yml/badge.svg)](https://github.com/YusufArrayyan/RAMBU/actions/workflows/ci.yml)
+
 Pendamping peminjam pinjaman daring (PWA, ponsel dan desktop). RAMBU menemani tiga momen: **sebelum setuju** (Cek: biaya sebenarnya, rasio terhadap penghasilan, biaya efektif dibanding batas OJK per segmen, klausul, uji paham, Putuskan), **setelah setuju** (Pinjamanku, Jadwal, pengingat yang tidak menekan), dan **saat terasa berat** (Butuh bantuan). Hitungan dikerjakan rumus tetap; AI hanya membaca, bertanya, dan mengutip, dan setiap keluarannya diperiksa kode. Tidak ada tombol pengajuan.
 
 - **PRD**: `C:\RAFATECH ESSAY\PRD_RAMBU_v4_G1A024009.docx` (v4.0, 5 Okt 2026, menggantikan v3)
@@ -24,6 +26,8 @@ npm run dev        # http://localhost:5173, /api diproksikan ke :8000
 
 Frontend tetap bekerja penuh tanpa backend: semua hitungan berjalan di perangkat. Backend hanya dibutuhkan untuk akun opsional (cadangan dan pengingat email), analitik anonim, panel admin, dan fitur AI.
 
+Demo publik di Render: New > Blueprint > pilih repositori ini; [render.yaml](render.yaml) menyiapkan layanan Docker gratis dengan HTTPS. Isi `GEMINI_API_KEY` saat diminta. Token admin demo menjadi `contoh-<peran>-<RAMBU_SEED_TOKEN_RAHASIA>`; nilainya terlihat di dashboard Render.
+
 Produksi dalam satu kontainer (FastAPI menyajikan API dan hasil build frontend):
 
 ```bash
@@ -47,6 +51,8 @@ Konfigurasi ada di `backend/.env` (salin dari [backend/.env.example](backend/.en
 | `RAMBU_AI_RATE_LIMIT` / `RAMBU_AI_RATE_WINDOW` | Batas pemakaian AI per klien. |
 
 ## Pengujian
+
+Setiap push ke `main` menjalankan GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)): pytest, typecheck dan vitest, build, lalu uji ujung ke ujung Playwright pada build produksi.
 
 ```bash
 cd backend && .venv/Scripts/python -m pytest      # 49 tes: Web Push (enkripsi, langganan, cabut saat keluar), golden v4, uji properti kontrafaktual, pemeriksa, akun, aturan dua orang, k-anonimitas, penjadwal
