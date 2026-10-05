@@ -37,6 +37,11 @@ class Settings:
     # Bawaan mati: kunci API di lingkungan tidak boleh mengaktifkan AI tanpa disengaja.
     ai_enabled_flag: bool = _env("RAMBU_AI_ENABLED", "false").lower() in {"1", "true", "yes"}
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
+    # Penyedia model: "anthropic" (bawaan) atau "gemini" (tingkat gratis Google AI Studio).
+    ai_provider: str = _env("RAMBU_AI_PROVIDER", "anthropic").strip().lower()
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    gemini_model: str = _env("RAMBU_GEMINI_MODEL", "gemini-flash-latest")
+    gemini_model_cadangan: list[str] = field(default_factory=lambda: _list("RAMBU_GEMINI_MODEL_CADANGAN", "gemini-flash-lite-latest,gemini-3.5-flash-lite"))
     model: str = _env("RAMBU_MODEL", "claude-opus-5-5")
     ai_rate_limit: int = int(_env("RAMBU_AI_RATE_LIMIT", "12"))  # permintaan per jendela per klien
     ai_rate_window_s: int = int(_env("RAMBU_AI_RATE_WINDOW", "600"))
@@ -71,6 +76,8 @@ class Settings:
 
     @property
     def ai_enabled(self) -> bool:
+        if self.ai_provider == "gemini":
+            return self.ai_enabled_flag and bool(self.gemini_api_key)
         has_credential = self.anthropic_api_key or os.getenv("ANTHROPIC_AUTH_TOKEN") or os.getenv("ANTHROPIC_PROFILE")
         return self.ai_enabled_flag and bool(has_credential)
 

@@ -34,7 +34,8 @@ Konfigurasi ada di `backend/.env` (salin dari [backend/.env.example](backend/.en
 
 | Variabel | Fungsi |
 |---|---|
-| `RAMBU_AI_ENABLED` | `true` untuk mengaktifkan lapisan AI. Bawaan `false`; tanpa ini, kartu AI disembunyikan (FR-26). |
+| `RAMBU_AI_ENABLED` | `true` untuk mengaktifkan lapisan AI. Bawaan `false`; tanpa ini, kartu AI disembunyikan (DOK-06). |
+| `RAMBU_AI_PROVIDER` | `anthropic` (bawaan) atau `gemini`. Gemini memakai `GEMINI_API_KEY` (tingkat gratis) dengan model cadangan bila kelebihan beban. Semua keluaran tetap melewati pemeriksa kode. |
 | `ANTHROPIC_API_KEY` | Kredensial model. Model hanya dipanggil atas klik atau pesan pengguna, tanpa percobaan ulang otomatis. |
 | `RAMBU_MODEL` | Model Claude, bawaan `claude-opus-5-5`. |
 | `RAMBU_ADMIN_TOKEN` | Token superadmin darurat (opsional). Admin biasa masuk dengan token pribadi per peran. |

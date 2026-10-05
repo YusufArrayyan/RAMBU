@@ -232,3 +232,11 @@ def test_deteksi_keselamatan_gagal_aman():
         assert menyiratkan_menyakiti_diri(t), t
     for t in ["cicilan motor 850 ribu", "aku mati-matian nabung", "bunuh waktu sambil nunggu gajian"]:
         assert not menyiratkan_menyakiti_diri(t) or "mati" in t, t
+
+
+def test_angka_gabungan_juta_ribu():
+    from app.formatting import angka_dalam_teks
+
+    assert 3_270_000 in angka_dalam_teks("total bayar 3 juta 270 ribu")
+    assert 1_090_000 in angka_dalam_teks("cicilannya 1 jt 90 rb sebulan")
+    assert 2_940_000 in angka_dalam_teks("2 juta dan 940 ribu")

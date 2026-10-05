@@ -48,6 +48,8 @@ def parse_angka_id(teks: str) -> float | None:
 
 _POLA_ANGKA = re.compile(r"(\d+(?:[.,]\d+)*)(?:\s*(juta|jt|ribu|rb|k)\b)?", re.IGNORECASE)
 _PENGALI = {"juta": 1_000_000, "jt": 1_000_000, "ribu": 1_000, "rb": 1_000, "k": 1_000}
+# Bentuk gabungan yang lazim diucapkan: "3 juta 270 ribu", "1 jt 90 rb", "2 juta dan 940 ribu"
+_POLA_GABUNGAN = re.compile(r"(\d+(?:[.,]\d+)?)\s*(?:juta|jt)\s*(?:dan\s+)?(\d+(?:[.,]\d+)?)\s*(?:ribu|rb|k)\b", re.IGNORECASE)
 
 
 def angka_dalam_teks(teks: str) -> list[float]:
@@ -64,6 +66,10 @@ def angka_dalam_teks(teks: str) -> list[float]:
         hasil.append(v)
         if m.group(2):
             hasil.append(v * _PENGALI[m.group(2).lower()])
+    for m in _POLA_GABUNGAN.finditer(teks):
+        juta, ribu = parse_angka_id(m.group(1)), parse_angka_id(m.group(2))
+        if juta is not None and ribu is not None and ribu < 1000:
+            hasil.append(juta * 1_000_000 + ribu * 1_000)
     return hasil
 
 
