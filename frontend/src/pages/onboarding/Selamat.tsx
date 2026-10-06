@@ -2,7 +2,7 @@
 import { Calculator, Lock, ShieldCheck } from "lucide-react";
 import { useEffect } from "react";
 import { Link, Navigate } from "react-router";
-import { Logo } from "@/components/Shell";
+import { Logo, TombolTema } from "@/components/Shell";
 import { LabelPerkiraan, TautanTombol } from "@/components/ui";
 import { useApp } from "@/state/app";
 
@@ -19,7 +19,8 @@ export default function Selamat() {
   }, []);
   if (data.mode) return <Navigate to="/beranda" replace />;
   return (
-    <main id="isi" className="mx-auto flex min-h-dvh max-w-[1120px] flex-col px-5 pt-10 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:px-10 lg:py-16">
+    <main id="isi" className="relative mx-auto flex min-h-dvh max-w-[1120px] flex-col px-5 pt-10 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:grid lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16 lg:px-10 lg:py-16">
+      <TombolTema className="absolute top-3 right-3 lg:top-6 lg:right-6" />
       <div className="flex flex-1 flex-col lg:flex-none">
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
           <img src="/logo-mark.png" alt="" width={112} height={112} className="size-24 lg:size-20" />

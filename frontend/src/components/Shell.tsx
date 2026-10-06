@@ -5,6 +5,7 @@
 import { ArrowLeft, Calculator, CalendarDays, HeartHandshake, House, List, Monitor, Moon, Sun, User } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation, useMatches, useNavigate } from "react-router";
+import { useApp } from "@/state/app";
 import { cx } from "./ui";
 
 export function Logo({ ukuran = 32, tulisan = true, className }: { ukuran?: number; tulisan?: boolean; className?: string }) {
@@ -20,7 +21,7 @@ export function Logo({ ukuran = 32, tulisan = true, className }: { ukuran?: numb
   );
 }
 
-// --- Tema (mengikuti sistem sebagai bawaan; bisa dipaksa di Saya) -----------------
+// --- Tema (terang sebagai bawaan; bisa diganti gelap atau ikut sistem) ------------
 
 export type Tema = "terang" | "gelap" | "sistem";
 
@@ -34,7 +35,7 @@ function terapkanTema(t: Tema) {
 
 const pendengarTema = new Set<(t: Tema) => void>();
 export function useTema() {
-  const [tema, setTemaLokal] = useState<Tema>(() => (localStorage.getItem("rambu-tema") as Tema) || "sistem");
+  const [tema, setTemaLokal] = useState<Tema>(() => (localStorage.getItem("rambu-tema") as Tema) || "terang");
   useEffect(() => {
     const f = (t: Tema) => setTemaLokal(t);
     pendengarTema.add(f);
@@ -60,9 +61,9 @@ export function useTema() {
 export function PilihTema() {
   const [tema, setTema] = useTema();
   const opsi: { t: Tema; label: string; Ikon: typeof Sun }[] = [
-    { t: "sistem", label: "Ikuti sistem", Ikon: Monitor },
     { t: "terang", label: "Terang", Ikon: Sun },
     { t: "gelap", label: "Gelap", Ikon: Moon },
+    { t: "sistem", label: "Ikuti sistem", Ikon: Monitor },
   ];
   return (
     <div role="radiogroup" aria-label="Tampilan" className="flex rounded-[14px] bg-sunken p-1">
@@ -87,6 +88,24 @@ export function PilihTema() {
   );
 }
 
+/** Satu tombol terang/gelap untuk halaman tanpa sidebar (sambutan, halaman info). */
+export function TombolTema({ className }: { className?: string }) {
+  const [tema, setTema] = useTema();
+  const gelap = tema === "gelap" || (tema === "sistem" && document.documentElement.classList.contains("dark"));
+  const Ikon = gelap ? Sun : Moon;
+  return (
+    <button
+      type="button"
+      onClick={() => setTema(gelap ? "terang" : "gelap")}
+      aria-label={gelap ? "Ganti ke tampilan terang" : "Ganti ke tampilan gelap"}
+      title={gelap ? "Tampilan terang" : "Tampilan gelap"}
+      className={cx("grid size-11 shrink-0 place-items-center rounded-full text-text2 hover:bg-sunken hover:text-ink", className)}
+    >
+      <Ikon aria-hidden className="size-5" />
+    </button>
+  );
+}
+
 // --- Navigasi --------------------------------------------------------------------
 
 const TAB = [
@@ -102,6 +121,26 @@ export interface PeganganRute {
   tab?: boolean;
   /** Halaman tanpa kerangka (onboarding) */
   polos?: boolean;
+  /** Halaman info (cara kerja, privasi, bantuan): berdiri sendiri bila pengguna belum mulai */
+  info?: boolean;
+}
+
+/** Bilah merek untuk halaman info yang dibuka sebelum pengguna mulai: tanpa menu aplikasi. */
+function BilahInfo() {
+  return (
+    <div className="border-b border-line bg-surface">
+      <div className="mx-auto flex min-h-16 max-w-[1120px] items-center gap-2 px-4 sm:px-6 lg:px-10">
+        <Link to="/selamat-datang" aria-label="RAMBU, ke halaman awal" className="flex min-h-11 items-center">
+          <Logo ukuran={28} />
+        </Link>
+        <span className="flex-1" />
+        <TombolTema />
+        <Link to="/cara-pakai" className="inline-flex min-h-11 items-center rounded-full bg-teal px-5 font-semibold text-on-teal hover:bg-teal-d">
+          Mulai
+        </Link>
+      </div>
+    </div>
+  );
 }
 
 function TabBar() {
@@ -179,9 +218,18 @@ export function KerangkaPeminjam() {
   const matches = useMatches();
   const pegangan = (matches.at(-1)?.handle ?? {}) as PeganganRute;
   const loc = useLocation();
+  const { data } = useApp();
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [loc.pathname]);
+  if (pegangan.info && !data.mode)
+    return (
+      <>
+        <LewatiKeIsi />
+        <BilahInfo />
+        <Outlet />
+      </>
+    );
   if (pegangan.polos)
     return (
       <>
@@ -242,7 +290,7 @@ export function Halaman({
             {kembali ? (
               <button
                 type="button"
-                onClick={() => (kembali === true ? nav(-1) : nav(kembali))}
+                onClick={() => (kembali !== true ? nav(kembali) : (window.history.state?.idx ?? 0) > 0 ? nav(-1) : nav("/"))}
                 aria-label="Kembali"
                 className="-ml-2 grid size-11 shrink-0 place-items-center rounded-full text-ink hover:bg-sunken"
               >

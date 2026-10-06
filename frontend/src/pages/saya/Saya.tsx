@@ -137,9 +137,9 @@ export default function Saya() {
               nilai={tema}
               onNilai={setTema}
               pilihan={[
-                { nilai: "sistem", label: "Sistem" },
                 { nilai: "terang", label: "Terang" },
                 { nilai: "gelap", label: "Gelap" },
+                { nilai: "sistem", label: "Sistem" },
               ]}
             />
           </Bagian>

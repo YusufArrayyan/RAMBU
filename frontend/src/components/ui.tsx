@@ -111,7 +111,7 @@ export function Lencana({ nada = "netral", ikon: Ikon, children, className, keci
   return (
     <span
       className={cx(
-        "inline-flex items-center rounded-full font-semibold leading-tight",
+        "inline-flex items-center rounded-full font-semibold leading-tight [overflow-wrap:normal]",
         kecil ? "min-h-6 gap-1 px-2 py-0.5 text-caption" : "min-h-8 gap-1.5 px-3 py-1 text-sm",
         KELAS_NADA[nada],
         className,

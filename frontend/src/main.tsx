@@ -40,6 +40,7 @@ const Admin = lazy(() => import("@/pages/admin/Admin"));
 const muat = (el: ReactNode) => <Suspense fallback={<div className="min-h-[60vh]" aria-busy="true" />}>{el}</Suspense>;
 const tab: PeganganRute = { tab: true };
 const polos: PeganganRute = { polos: true };
+const info: PeganganRute = { info: true };
 
 function Akar() {
   const { data } = useApp();
@@ -92,9 +93,9 @@ const router = createBrowserRouter([
       { path: "/saya/pengingat", element: muat(<Pengingat />) },
       { path: "/saya/notifikasi", element: muat(<Notifikasi />) },
 
-      { path: "/bantuan", element: muat(<Bantuan />) },
-      { path: "/cara-hitung", element: muat(<CaraHitung />) },
-      { path: "/privasi", element: muat(<Privasi />) },
+      { path: "/bantuan", element: muat(<Bantuan />), handle: info },
+      { path: "/cara-hitung", element: muat(<CaraHitung />), handle: info },
+      { path: "/privasi", element: muat(<Privasi />), handle: info },
       { path: "/desain", element: muat(<Desain />) },
       { path: "*", element: <TidakDitemukan /> },
     ],
