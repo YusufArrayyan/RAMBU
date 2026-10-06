@@ -14,7 +14,12 @@ from pathlib import Path
 
 from .config import settings
 
-SEGMEN = ("konsumtif_mikro", "konsumtif_kecil", "produktif")
+SEGMEN = ("konsumtif", "produktif")
+
+
+def normal_segmen(s):
+    """Id segmen lama (versi 2026.10.1: konsumtif_mikro, konsumtif_kecil) menjadi konsumtif; nilai lain apa adanya."""
+    return "konsumtif" if s in ("konsumtif_mikro", "konsumtif_kecil") else s
 
 
 @dataclass(frozen=True)
@@ -27,6 +32,7 @@ class BarisBatas:
     persen_maks: float | None
     sumber: str
     status: str
+    pokok_maks: float | None = None
 
 
 @dataclass(frozen=True)
@@ -46,13 +52,18 @@ class VersiRegulasi:
     batas_harian: tuple[BarisBatas, ...]
     patokan_rasio_persen: float
     mentah: dict
+    admin_termasuk: bool = False
+    batas_total_persen: float | None = None
 
-    def batas_harian_untuk(self, segmen: str, tenor: int) -> Batas:
+    def batas_harian_untuk(self, segmen: str, tenor: int, pokok: float = 0) -> Batas:
         cocok = next(
             (
                 b
                 for b in self.batas_harian
-                if b.status != "nonaktif" and b.segmen in (segmen, "semua") and (b.tenor_maks_hari is None or tenor <= b.tenor_maks_hari)
+                if b.status != "nonaktif"
+                and b.segmen in (segmen, "semua")
+                and (b.pokok_maks is None or pokok <= b.pokok_maks)
+                and (b.tenor_maks_hari is None or tenor <= b.tenor_maks_hari)
             ),
             self.batas_harian[-1],
         )
@@ -86,11 +97,14 @@ def parse(v: dict) -> VersiRegulasi:
                 persen_maks=b.get("persen_maks"),
                 sumber=b["sumber"],
                 status=b["status"],
+                pokok_maks=b.get("pokok_maks"),
             )
             for b in v["batas_harian"]
         ),
         patokan_rasio_persen=float(v["patokan_rasio"]["persen"]),
         mentah=v,
+        admin_termasuk=(v.get("admin_termasuk_batas") or {}).get("nilai") is True,
+        batas_total_persen=float(v["batas_total"]["persen"]) if v.get("batas_total") else None,
     )
 
 

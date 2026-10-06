@@ -13,13 +13,25 @@
       "id": "2026.10.1",
       "berlaku_mulai": "2025-05-20",
       "diterbitkan": "2026-10-02",
-      "status": "terbit",
+      "status": "diganti",
       "pengaju": "Penyunting (contoh)",
       "penyetuju": "Peninjau (contoh)",
       "segmen": [
-        { "id": "konsumtif_mikro", "jenis": "konsumtif", "label": "Konsumtif mikro dan ultramikro" },
-        { "id": "konsumtif_kecil", "jenis": "konsumtif", "label": "Konsumtif kecil dan menengah" },
-        { "id": "produktif", "jenis": "produktif", "label": "Produktif" }
+        {
+          "id": "konsumtif_mikro",
+          "jenis": "konsumtif",
+          "label": "Konsumtif mikro dan ultramikro"
+        },
+        {
+          "id": "konsumtif_kecil",
+          "jenis": "konsumtif",
+          "label": "Konsumtif kecil dan menengah"
+        },
+        {
+          "id": "produktif",
+          "jenis": "produktif",
+          "label": "Produktif"
+        }
       ],
       "batas_harian": [
         {
@@ -70,9 +82,113 @@
         "catatan": "Patokan, bukan batas hukum. Cakupan (seluruh kreditur atau per penyelenggara) masih diverifikasi."
       },
       "nonaktif": [
-        { "nama": "Batas total manfaat 100% dari pokok", "alasan": "Tidak terverifikasi, dibuang pada v4" },
-        { "nama": "Rasio cicilan 40% pada 2025", "alasan": "Tidak terverifikasi, dibuang pada v4" },
-        { "nama": "SEOJK 19/SEOJK.06/2025 (syarat 18 tahun dan penghasilan Rp3.000.000)", "alasan": "Belum diverifikasi ulang terhadap teks resmi; tidak dipakai sebagai sumber parameter" }
+        {
+          "nama": "Batas total manfaat 100% dari pokok",
+          "alasan": "Tidak terverifikasi, dibuang pada v4"
+        },
+        {
+          "nama": "Rasio cicilan 40% pada 2025",
+          "alasan": "Tidak terverifikasi, dibuang pada v4"
+        },
+        {
+          "nama": "SEOJK 19/SEOJK.06/2025 (syarat 18 tahun dan penghasilan Rp3.000.000)",
+          "alasan": "Belum diverifikasi ulang terhadap teks resmi; tidak dipakai sebagai sumber parameter"
+        }
+      ],
+      "diganti_oleh": "2026.10.2",
+      "catatan_penggantian": "Pemetaan segmen keliru (0,275% adalah batas produktif, bukan konsumtif kecil). Diganti dengan teks resmi SEOJK 19/SEOJK.06/2025."
+    },
+    {
+      "id": "2026.10.2",
+      "berlaku_mulai": "2025-07-31",
+      "diterbitkan": "2026-10-06",
+      "status": "terbit",
+      "pengaju": "Penyunting (contoh)",
+      "penyetuju": "Peninjau (contoh)",
+      "segmen": [
+        {
+          "id": "konsumtif",
+          "jenis": "konsumtif",
+          "label": "Konsumtif (keperluan pribadi)"
+        },
+        {
+          "id": "produktif",
+          "jenis": "produktif",
+          "label": "Produktif (modal usaha)"
+        }
+      ],
+      "batas_harian": [
+        {
+          "id": "konsumtif_maks6",
+          "segmen": "konsumtif",
+          "tenor_maks_hari": 180,
+          "persen": 0.3,
+          "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 3 huruf b",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "konsumtif_lebih6",
+          "segmen": "konsumtif",
+          "tenor_maks_hari": null,
+          "persen": 0.2,
+          "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 3 huruf b",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "produktif_kecil_maks6",
+          "segmen": "produktif",
+          "pokok_maks": 50000000,
+          "tenor_maks_hari": 180,
+          "persen": 0.275,
+          "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 3 huruf a",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "produktif_kecil_lebih6",
+          "segmen": "produktif",
+          "pokok_maks": 50000000,
+          "tenor_maks_hari": null,
+          "persen": 0.1,
+          "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 3 huruf a",
+          "status": "terverifikasi"
+        },
+        {
+          "id": "produktif_besar",
+          "segmen": "produktif",
+          "tenor_maks_hari": null,
+          "persen": 0.1,
+          "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 3 huruf a",
+          "status": "terverifikasi"
+        }
+      ],
+      "admin_termasuk_batas": {
+        "nilai": true,
+        "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 2",
+        "status": "terverifikasi",
+        "catatan": "Biaya admin, komisi, dan fee platform termasuk manfaat ekonomi, jadi yang dibandingkan dengan batas adalah biaya efektif. Denda keterlambatan, biaya tanda tangan elektronik, dan pajak tidak termasuk."
+      },
+      "batas_total": {
+        "persen": 100,
+        "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIV angka 5",
+        "status": "terverifikasi",
+        "catatan": "Seluruh manfaat ekonomi dan denda keterlambatan tidak melebihi 100% dari nilai pinjaman. RAMBU belum menghitung denda."
+      },
+      "patokan_rasio": {
+        "persen": 30,
+        "sumber": "SEOJK 19/SEOJK.06/2025 Romawi XIII angka 2",
+        "status": "terverifikasi",
+        "cakupan_status": "terverifikasi",
+        "catatan": "Batas yang wajib dipakai penyelenggara saat menilai kemampuan bayar pinjaman konsumtif sejak 2026, dihitung dari cicilan ke seluruh kreditur: penyelenggara pindar, bank, perusahaan pembiayaan, pegadaian, dan lembaga jasa keuangan lain."
+      },
+      "nonaktif": [
+        {
+          "nama": "Rasio cicilan 40%",
+          "alasan": "Hanya berlaku pada 2025 (SEOJK 19/SEOJK.06/2025 Romawi XIII angka 2 huruf a)"
+        },
+        {
+          "nama": "Segmen konsumtif mikro dan kecil (versi 2026.10.1)",
+          "alasan": "Tidak ada di teks SEOJK; batas konsumtif hanya dibedakan menurut tenor"
+        }
       ]
     }
   ]

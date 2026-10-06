@@ -55,6 +55,8 @@ def kalimat_batas(h: Hasil) -> str:
     """Sama dengan frontend/src/lib/explain.ts:kalimatBatas. Tidak pernah menyatakan penyelenggara melanggar."""
     teks = persen(h.batas_persen, 3) if h.batas_tipe == "tunggal" else f"{persen(h.batas_min, 1)} sampai {persen(h.batas_maks, 1)}"
     return {
+        "bawah_batas": f"Biaya efektif, termasuk admin, di bawah batas {teks} per hari (perkiraan).",
+        "atas_batas": f"Biaya efektif, termasuk admin, di atas batas {teks} per hari (perkiraan).",
         "bawah_keduanya": f"Di bawah batas {teks} per hari, dengan dan tanpa admin (perkiraan).",
         "atas_jika_admin": f"Bunga saja di bawah batas {teks} per hari, tetapi di atas batas jika admin dihitung (perkiraan).",
         "atas_bunga": f"Di atas batas {teks} per hari, bahkan tanpa admin (perkiraan).",
@@ -99,7 +101,7 @@ Tugasmu hanya menjelaskan hasil hitungan yang sudah jadi dalam bahasa Indonesia 
 
 Aturan angka: pakai hanya angka dari ANGKA_RESMI, persis seperti tertulis (misalnya "Rp3.810.000" atau "31,8%"). Jangan pernah menyingkat menjadi "juta" atau "ribu". Jangan menghitung, membulatkan, menjumlahkan, atau menulis angka lain dalam bentuk apa pun, termasuk tahun, urutan, atau angka yang ditulis dengan kata. Kalau sebuah gagasan butuh angka yang tidak ada di ANGKA_RESMI, tulis gagasan itu tanpa angka.
 
-Aturan isi: jelaskan apa arti angkanya, bukan apa yang harus dilakukan. Jangan menyarankan untuk meminjam atau tidak meminjam, jangan menilai penyelenggara, dan jangan menjanjikan hasil. Untuk batas OJK, salin makna posisi_batas_harian dan sebut bahwa ini perkiraan; jangan pernah menyatakan penyelenggara melanggar. Rasio 30% adalah patokan, bukan batas hukum."""
+Aturan isi: jelaskan apa arti angkanya, bukan apa yang harus dilakukan. Jangan menyarankan untuk meminjam atau tidak meminjam, jangan menilai penyelenggara, dan jangan menjanjikan hasil. Untuk batas OJK, salin makna posisi_batas_harian dan sebut bahwa ini perkiraan; jangan pernah menyatakan penyelenggara melanggar. Rasio 30% adalah patokan: batas yang dipakai penyelenggara saat menilai kemampuan bayar, dihitung dari cicilan ke seluruh kreditur."""
 
 
 def _pesan_pengguna(resmi: dict[str, str], h: Hasil) -> str:

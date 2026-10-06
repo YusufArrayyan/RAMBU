@@ -120,6 +120,7 @@ class BarisBatasIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
     id: str = Field(pattern=r"^[a-z0-9_]{3,40}$")
     segmen: str
+    pokok_maks: float | None = Field(default=None, gt=0)
     tenor_maks_hari: int | None = Field(default=None, ge=1, le=3650)
     persen: float | None = Field(default=None, ge=0, le=5)
     persen_min: float | None = Field(default=None, ge=0, le=5)
@@ -398,7 +399,7 @@ def laporan_mitra(hari: int = Query(default=30, ge=7, le=365), _: Pelaku = Depen
     cek = sesi("offer_calculated")
     uji = sesi("uji_paham_completed")
     keputusan = {p: len(sesi("decision_made", pilihan=p)) for p in ("ambil", "tidak_jadi", "ubah")}
-    per_segmen = {s: len(sesi("offer_calculated", segmen=s)) for s in ("konsumtif_mikro", "konsumtif_kecil", "produktif")}
+    per_segmen = {s: len(sesi("offer_calculated", segmen=s)) for s in reg_mod.SEGMEN}
     tepat = Counter((pr or {}).get("tepat") for _, pr in db.execute(select(Peristiwa.sid, Peristiwa.props).where(Peristiwa.nama == "uji_paham_completed", Peristiwa.waktu >= sejak)).all())
     total_keputusan = sum(keputusan.values())
     return {

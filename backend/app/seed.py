@@ -54,8 +54,8 @@ def seed(db: Session) -> None:
         dasar = versi_aktif().mentah
         usul = [dict(b) for b in dasar["batas_harian"]]
         for b in usul:
-            if b["id"] == "semua_lebih6":
-                b["sumber"] = "Draf contoh: pemetaan segmen tenor lebih dari 6 bulan menunggu teks ketentuan"
+            if b["id"] == "konsumtif_lebih6":
+                b["sumber"] = "Draf contoh: rujukan halaman SEOJK 19/SEOJK.06/2025 untuk tenor lebih dari 6 bulan"
         db.add(
             VersiParameter(
                 versi="2026.11.1",

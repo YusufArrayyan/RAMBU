@@ -3,12 +3,11 @@ import { Check, ChevronDown, Sparkles } from "lucide-react";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { BacaDokumen } from "@/components/BacaDokumen";
-import { IsianAngka, IsianPilih } from "@/components/Isian";
+import { IsianAngka } from "@/components/Isian";
 import { Halaman } from "@/components/Shell";
 import { Kartu, Pemberitahuan, Segmented, TagAI, Tombol, cx } from "@/components/ui";
 import { catat } from "@/lib/analytics";
 import { bersihkanDesimal, parseDesimal, persen, rupiah, tampilDesimal } from "@/lib/format";
-import type { IdSegmen } from "@/lib/regulasi";
 import { useApp } from "@/state/app";
 import { useKonfig } from "@/state/config";
 import { keHarian, useAlur, type SatuanBunga } from "@/state/flow";
@@ -171,7 +170,7 @@ export default function IsiPenawaran() {
                       key={j}
                       type="button"
                       aria-pressed={jenis === j}
-                      onClick={() => ubah({ segmen: j === "produktif" ? "produktif" : "konsumtif_mikro" })}
+                      onClick={() => ubah({ segmen: j })}
                       className={cx(
                         "inline-flex min-h-11 items-center gap-1.5 rounded-full border-[1.5px] px-4 font-semibold transition-colors",
                         jenis === j ? "border-teal bg-tint text-teal-d" : "border-line-strong bg-surface text-ink hover:border-teal",
@@ -182,20 +181,7 @@ export default function IsiPenawaran() {
                     </button>
                   ))}
                 </div>
-                {jenis === "konsumtif" && (
-                  <IsianPilih<IdSegmen>
-                    className="mt-3"
-                    label="Kelompok pinjaman konsumtif"
-                    name="segmen"
-                    nilai={alur.segmen}
-                    onNilai={(v) => ubah({ segmen: v })}
-                    pilihan={[
-                      { nilai: "konsumtif_mikro", label: "Mikro atau ultramikro (umum untuk pinjaman kecil)" },
-                      { nilai: "konsumtif_kecil", label: "Kecil atau menengah" },
-                    ]}
-                    petunjuk="Menentukan batas bunga OJK yang dipakai pembanding. Bila ragu, biarkan mikro atau ultramikro."
-                  />
-                )}
+                <p className="mt-2 text-sm text-muted">Menentukan batas biaya OJK yang dipakai pembanding. Pinjaman untuk keperluan pribadi termasuk konsumtif.</p>
               </fieldset>
               <IsianAngka label="Nilai pinjaman" name="pokok" jenis="rupiah" nilai={alur.pokok} onNilai={(n) => ubah({ pokok: n })} galat={coba ? galat.pokok : null} placeholder="3.000.000" />
               <IsianAngka label="Tenor" name="tenor" jenis="bulat" satuan="hari" nilai={alur.tenor} onNilai={(n) => ubah({ tenor: n })} galat={coba ? galat.tenor : null} placeholder="90" />

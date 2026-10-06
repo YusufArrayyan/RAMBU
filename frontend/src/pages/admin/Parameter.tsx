@@ -5,7 +5,7 @@ import { IsianAngka, IsianTeks } from "@/components/Isian";
 import { Lembar } from "@/components/Lembar";
 import { Kartu, Pemberitahuan, Tombol, cx } from "@/components/ui";
 import { panggilAdmin, type Saya, type VersiParameterAdmin } from "@/lib/admin";
-import { persen } from "@/lib/format";
+import { angka, persen } from "@/lib/format";
 import type { BarisBatasHarian, VersiRegulasi } from "@/lib/regulasi";
 import { KepalaAdmin, Memuat, useMuat } from "./Admin";
 import { LencanaAdmin, waktu } from "./Dasbor";
@@ -16,9 +16,9 @@ interface Data {
   saya_id: number | null;
 }
 
-const LABEL_SEGMEN: Record<string, string> = { konsumtif_mikro: "Konsumtif mikro/ultramikro", konsumtif_kecil: "Konsumtif kecil/menengah", produktif: "Produktif", semua: "Semua segmen" };
+const LABEL_SEGMEN: Record<string, string> = { konsumtif: "Konsumtif", produktif: "Produktif", konsumtif_mikro: "Konsumtif mikro/ultramikro", konsumtif_kecil: "Konsumtif kecil/menengah", semua: "Semua segmen" };
 const nilaiBaris = (b: BarisBatasHarian) => (b.persen !== undefined && b.persen !== null ? persen(b.persen, 3) : `${persen(b.persen_min ?? 0, 1)} – ${persen(b.persen_maks ?? 0, 1)}`);
-const tenorBaris = (b: BarisBatasHarian) => (b.tenor_maks_hari === null ? "> 6 bulan" : "≤ 6 bulan");
+const tenorBaris = (b: BarisBatasHarian) => `${b.tenor_maks_hari === null ? "> 6 bulan" : "≤ 6 bulan"}${b.pokok_maks != null ? `, pinjaman ≤ Rp${angka(b.pokok_maks)}` : ""}`;
 
 function TabelParameter({ v }: { v: VersiRegulasi }) {
   return (
@@ -54,7 +54,9 @@ function TabelParameter({ v }: { v: VersiRegulasi }) {
             </th>
             <td className="px-3 py-3 text-text2">semua</td>
             <td className="angka px-3 py-3 font-bold text-ink">{persen(v.patokan_rasio.persen, 0)}</td>
-            <td className="px-3 py-3 text-text2">{v.patokan_rasio.sumber}; cakupan belum pasti</td>
+            <td className="px-3 py-3 text-text2">{v.patokan_rasio.sumber}
+              {v.patokan_rasio.cakupan_status === "terverifikasi" ? "; seluruh kreditur" : "; cakupan belum pasti"}
+            </td>
             <td className="px-3 py-3">
               <LencanaAdmin status={v.patokan_rasio.status} />
             </td>

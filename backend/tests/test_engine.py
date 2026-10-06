@@ -7,7 +7,7 @@ import pytest
 
 from app.engine import Masukan, hitung, kontrafaktual, uji_tekanan
 from app.formatting import parse_angka_id, persen, rupiah
-from app.regulasi import versi_aktif
+from app.regulasi import semua_versi, versi_aktif
 
 GOLDEN = json.loads((Path(__file__).resolve().parents[2] / "shared" / "golden.json").read_text(encoding="utf-8"))
 REG = versi_aktif(date.fromisoformat(GOLDEN["tanggal_acuan"]))
@@ -21,7 +21,7 @@ def _masukan(d: dict) -> Masukan:
         admin_persen=d["admin_persen"],
         penghasilan=d["penghasilan"],
         cicilan_lain=d["cicilan_lain"],
-        segmen=d.get("segmen", "konsumtif_mikro"),
+        segmen=d.get("segmen", "konsumtif"),
     )
 
 
@@ -51,12 +51,13 @@ def test_golden(kasus):
     assert persen(h.rasio_sendiri_persen, 1) == t["rasio_sendiri"]
     assert persen(h.rasio_persen, 1) == t["rasio"]
     assert persen(h.efektif_harian_persen, 3) == t["efektif"]
-    assert h.versi_parameter == "2026.10.1"
+    assert h.versi_parameter == GOLDEN["versi_acuan"]
 
 
 @pytest.mark.parametrize("kasus", GOLDEN["tepi"], ids=lambda k: k["nama"])
 def test_tepi(kasus):
-    h = hitung(_masukan(kasus["masukan"]), REG)
+    reg = next(v for v in semua_versi() if v.id == kasus["versi"]) if "versi" in kasus else REG
+    h = hitung(_masukan(kasus["masukan"]), reg)
     if kasus["harapan"] is None:
         assert h is None
     else:
@@ -115,11 +116,15 @@ def test_biaya_sama_dengan_bunga_tambah_admin():
     assert h.jumlah_cicilan == 2
 
 
-def test_parameter_dibuang_v4_tidak_dipakai():
+def test_parameter_mengikuti_teks_seojk():
     raw = REG.mentah
-    assert "batas_total_manfaat_persen" not in raw
-    assert {n["nama"] for n in raw["nonaktif"]} >= {"Batas total manfaat 100% dari pokok", "Rasio cicilan 40% pada 2025"}
-    assert all(b["sumber"] for b in raw["batas_harian"])
+    # SEOJK 19/SEOJK.06/2025 Romawi XIII-XIV: setiap baris bersumber teks resmi, admin termasuk batas,
+    # batas total 100%, rasio 30% ke seluruh kreditur.
+    assert all(b["sumber"].startswith("SEOJK 19/SEOJK.06/2025") and b["status"] == "terverifikasi" for b in raw["batas_harian"])
+    assert REG.admin_termasuk is True and REG.batas_total_persen == 100
+    assert raw["patokan_rasio"]["cakupan_status"] == "terverifikasi"
+    lama = next(v for v in semua_versi() if v.id == "2026.10.1")
+    assert lama.status == "diganti" and lama.admin_termasuk is False
 
 
 def test_format():

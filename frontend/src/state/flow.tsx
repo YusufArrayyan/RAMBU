@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Klausul } from "@/lib/api";
 import { hitung, type Hasil, type Masukan } from "@/lib/engine";
 import { cicilanBerikutnya, hariIni, type Pinjaman } from "@/lib/jadwal";
-import type { IdSegmen } from "@/lib/regulasi";
+import { normalSegmen, type IdSegmen } from "@/lib/regulasi";
 import type { BidangUji } from "@/lib/ujiPaham";
 
 export type SatuanBunga = "hari" | "bulan" | "tahun";
@@ -64,7 +64,7 @@ export function keHarian(nilai: number | null, satuan: SatuanBunga): number | nu
 export function alurKosong(): Alur {
   const id = idBaru();
   return {
-    segmen: "konsumtif_mikro",
+    segmen: "konsumtif",
     pokok: null,
     tenor: null,
     bungaTertulis: null,
@@ -102,7 +102,7 @@ function muat(): Alur {
     const raw = sessionStorage.getItem(KUNCI);
     if (raw) {
       const a = JSON.parse(raw) as Alur;
-      if (Array.isArray(a.penawaran) && a.penawaran.length) return { ...alurKosong(), ...a };
+      if (Array.isArray(a.penawaran) && a.penawaran.length) return { ...alurKosong(), ...a, segmen: normalSegmen(a.segmen) };
     }
   } catch {
     /* abaikan */

@@ -3,7 +3,7 @@
  * Fungsi murni tanpa I/O. Kembaran Python ada di backend/app/engine.py; keduanya diuji
  * dengan shared/golden.json.
  */
-import { batasHarianUntuk, versiAktif, type BatasHarian, type IdSegmen, type VersiRegulasi } from "./regulasi";
+import { adminTermasuk, batasHarianUntuk, versiAktif, type BatasHarian, type IdSegmen, type VersiRegulasi } from "./regulasi";
 
 export interface Masukan {
   /** P, rupiah */
@@ -18,12 +18,17 @@ export interface Masukan {
   penghasilan?: number | null;
   /** K, rupiah per bulan */
   cicilanLain?: number | null;
-  /** Segmen untuk batas harian. Bawaan konsumtif mikro/ultramikro. */
+  /** Segmen untuk batas harian. Bawaan konsumtif. */
   segmen?: IdSegmen;
 }
 
-/** Posisi biaya terhadap batas harian OJK. Dua angka sampai cakupan admin jelas (CEK-07). */
+/**
+ * Posisi biaya terhadap batas harian OJK. Bila parameter menyatakan admin termasuk batas,
+ * yang dibandingkan biaya efektif (bawah_batas / atas_batas). Bila belum pasti, dua angka (CEK-07).
+ */
 export type StatusBatas =
+  | "bawah_batas" // biaya efektif (bunga + admin) tidak melewati batas
+  | "atas_batas" // biaya efektif melewati batas
   | "bawah_keduanya" // bunga saja dan efektif di bawah batas
   | "atas_jika_admin" // bunga saja di bawah, efektif (dengan admin) di atas
   | "atas_bunga" // bunga saja pun di atas batas
@@ -49,6 +54,10 @@ export interface Hasil {
   efektifHarianPersen: number;
   batas: BatasHarian;
   statusBatas: StatusBatas;
+  /** Batas biaya total terhadap pokok (persen); null bila versi parameter tidak memuatnya. */
+  batasTotalPersen: number | null;
+  /** Biaya (bunga + admin, tanpa denda) sudah melewati batas total */
+  diAtasBatasTotal: boolean | null;
   versiParameter: string;
 }
 
@@ -76,7 +85,8 @@ export function valid(m: Masukan): boolean {
 
 export const jumlahCicilanUntuk = (tenor: number) => Math.max(1, Math.ceil(tenor / 30));
 
-function posisiBatas(bungaHarian: number, efektif: number, batas: BatasHarian): StatusBatas {
+function posisiBatas(bungaHarian: number, efektif: number, batas: BatasHarian, denganAdmin: boolean): StatusBatas {
+  if (denganAdmin && batas.tipe === "tunggal") return efektif > batas.persen + EPS ? "atas_batas" : "bawah_batas";
   if (batas.tipe === "tunggal") {
     if (bungaHarian > batas.persen + EPS) return "atas_bunga";
     if (efektif > batas.persen + EPS) return "atas_jika_admin";
@@ -106,7 +116,8 @@ export function hitung(m: Masukan, reg: VersiRegulasi = versiAktif()): Hasil | n
   const rasioPersen = I > 0 ? ((cicilan + K) / I) * 100 : null;
   const efektifHarianPersen = (biaya / (P * T)) * 100;
   const patokanPersen = reg.patokan_rasio.persen;
-  const batas = batasHarianUntuk(reg, m.segmen ?? "konsumtif_mikro", T);
+  const batas = batasHarianUntuk(reg, m.segmen ?? "konsumtif", T, P);
+  const batasTotalPersen = reg.batas_total?.persen ?? null;
 
   return {
     bunga,
@@ -124,7 +135,9 @@ export function hitung(m: Masukan, reg: VersiRegulasi = versiAktif()): Hasil | n
     bungaHarianPersen: m.bungaHarianPersen!,
     efektifHarianPersen,
     batas,
-    statusBatas: posisiBatas(m.bungaHarianPersen!, efektifHarianPersen, batas),
+    statusBatas: posisiBatas(m.bungaHarianPersen!, efektifHarianPersen, batas, adminTermasuk(reg)),
+    batasTotalPersen,
+    diAtasBatasTotal: batasTotalPersen === null ? null : (biaya / P) * 100 > batasTotalPersen + EPS,
     versiParameter: reg.id,
   };
 }

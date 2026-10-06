@@ -8,7 +8,7 @@ import { Kartu, LabelPerkiraan, Lencana, Tombol, cx } from "@/components/ui";
 import type { Hasil, Masukan } from "@/lib/engine";
 import { kalimatBatas } from "@/lib/explain";
 import { persen, rupiah, rupiahKata } from "@/lib/format";
-import { kanalPengaduan, segmenUntuk, versiAktif } from "@/lib/regulasi";
+import { kanalPengaduan, segmenUntuk, teksPatokan, versiAktif } from "@/lib/regulasi";
 import { useAlur } from "@/state/flow";
 
 function Baris({ label, nilai, kata, besaran, masukan, hasil, tambahan }: { label: string; nilai: string; kata?: string; besaran?: Parameters<typeof InfoTelusur>[0]["besaran"]; masukan: Masukan; hasil: Hasil; tambahan?: string }) {
@@ -30,6 +30,18 @@ export function LencanaBatas({ h }: { h: Hasil }) {
   const b = h.batas;
   const teks = b.tipe === "tunggal" ? persen(b.persen, 3) : `${persen(b.min, 1)}–${persen(b.maks, 1)}`;
   switch (h.statusBatas) {
+    case "bawah_batas":
+      return (
+        <Lencana nada="teal" ikon={CircleCheck}>
+          Di bawah batas {teks}, admin ikut dihitung
+        </Lencana>
+      );
+    case "atas_batas":
+      return (
+        <Lencana nada="amber" ikon={TriangleAlert}>
+          Di atas batas {teks}, admin ikut dihitung
+        </Lencana>
+      );
     case "bawah_keduanya":
       return (
         <Lencana nada="teal" ikon={CircleCheck}>
@@ -135,7 +147,7 @@ export default function BiayaSebenarnya() {
                   <BilahRasio nilai={h.rasioPersen} patokan={h.patokanPersen} label="Bersama cicilan lain" />
                 </div>
                 <LencanaPatokan diAtas={!!h.diAtasPatokan} patokan={h.patokanPersen} />
-                <p className="text-sm text-muted">Patokan {persen(h.patokanPersen, 0)}, bukan batas hukum. Cakupannya (seluruh kreditur atau per penyelenggara) masih diverifikasi.</p>
+                <p className="text-sm text-muted">{teksPatokan(reg)}</p>
               </div>
             )}
           </Kartu>
@@ -159,8 +171,13 @@ export default function BiayaSebenarnya() {
             <div className="mt-3">
               <LencanaBatas h={h} />
             </div>
+            {h.diAtasBatasTotal && (
+              <p className="mt-3 rounded-xl bg-amber-soft p-3 text-sm text-ink">
+                Biaya pinjaman <span className="angka font-bold">{persen(h.biayaPersenPokok, 0)}</span> dari pokok, di atas batas total {persen(h.batasTotalPersen!, 0)} untuk seluruh biaya dan denda.
+              </p>
+            )}
             <p className="mt-3 text-sm text-muted">
-              {kalimatBatas(h)} Segmen: {segmen.label.toLowerCase()}, tenor {m.tenor} hari. Sumber: {h.batas.baris.sumber}. RAMBU tidak menyatakan penyelenggara melanggar.
+              {kalimatBatas(h)} Jenis: {segmen.label.toLowerCase()}, tenor {m.tenor} hari. Sumber: {h.batas.baris.sumber}. RAMBU tidak menyatakan penyelenggara melanggar.
             </p>
           </Kartu>
 

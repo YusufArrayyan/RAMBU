@@ -41,7 +41,10 @@ def test_hitung_dan_kontrafaktual():
     with klien() as c:
         body = c.post("/api/hitung", json=CONTOH).json()
         assert body["tampilan"]["total_bayar"] == "Rp3.270.000"
-        assert body["hasil"]["status_batas"] == "bawah_keduanya"
+        assert body["hasil"]["status_batas"] == "bawah_batas"
+        # Id segmen lama dari perangkat yang belum diperbarui tetap diterima sebagai konsumtif.
+        lama = c.post("/api/hitung", json={**CONTOH, "segmen": "konsumtif_kecil"}).json()
+        assert lama["hasil"]["batas_persen"] == 0.3
         assert body["kontrafaktual"]["pokok_maks"] == 2_477_000
         assert body["label"] == "Perkiraan"
         assert c.post("/api/hitung", json={**CONTOH, "tenor": 0}).status_code == 422

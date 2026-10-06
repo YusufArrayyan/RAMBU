@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/YusufArrayyan/RAMBU/actions/workflows/ci.yml/badge.svg)](https://github.com/YusufArrayyan/RAMBU/actions/workflows/ci.yml)
 
-Pendamping peminjam pinjaman daring (PWA, ponsel dan desktop). RAMBU menemani tiga momen: **sebelum setuju** (Cek: biaya sebenarnya, rasio terhadap penghasilan, biaya efektif dibanding batas OJK per segmen, klausul, uji paham, Putuskan), **setelah setuju** (Pinjamanku, Jadwal, pengingat yang tidak menekan), dan **saat terasa berat** (Butuh bantuan). Hitungan dikerjakan rumus tetap; AI hanya membaca, bertanya, dan mengutip, dan setiap keluarannya diperiksa kode. Tidak ada tombol pengajuan.
+Pendamping peminjam pinjaman daring (PWA, ponsel dan desktop). RAMBU menemani tiga momen: **sebelum setuju** (Cek: biaya sebenarnya, rasio terhadap penghasilan, biaya efektif dibanding batas OJK per jenis pinjaman dan tenor, klausul, uji paham, Putuskan), **setelah setuju** (Pinjamanku, Jadwal, pengingat yang tidak menekan), dan **saat terasa berat** (Butuh bantuan). Hitungan dikerjakan rumus tetap; AI hanya membaca, bertanya, dan mengutip, dan setiap keluarannya diperiksa kode. Tidak ada tombol pengajuan.
 
 - **PRD**: `C:\RAFATECH ESSAY\PRD_RAMBU_v4_G1A024009.docx` (v4.0, 5 Okt 2026, menggantikan v3)
 - **Konteks produk**: [PRODUCT.md](PRODUCT.md) · **Sistem desain**: [DESIGN.md](DESIGN.md) · galeri hidup di rute `/desain`
@@ -106,10 +106,10 @@ Panel admin di lingkungan pengembangan memakai data contoh; token masuk contoh t
 
 ## Catatan sebelum rilis publik
 
-Hal bertanda PERLU DATA di PRD v4 belum bisa diputuskan kode:
+Parameter OJK versi 2026.10.2 sudah dicocokkan dengan teks resmi SEOJK 19/SEOJK.06/2025 (31 Juli 2025): konsumtif 0,3% per hari untuk tenor sampai 6 bulan dan 0,2% di atasnya; produktif sampai Rp50 juta 0,275% dan 0,1%, di atas Rp50 juta 0,1%; admin termasuk batas (Romawi XIV angka 2); seluruh biaya dan denda paling banyak 100% dari pinjaman (angka 5); rasio cicilan ke seluruh kreditur paling tinggi 30% sejak 2026 (Romawi XIII). Versi 2026.10.1 yang memakai pemetaan segmen dari siaran pers ditandai `diganti`, dan mesin hitung tetap bisa membacanya (mode dua angka saat cakupan admin belum pasti).
 
-- Batas bunga tenor lebih dari 6 bulan (0,1–0,2%) dan apakah batas harian termasuk admin: layar menampilkan dua angka dan lencana "belum pasti" sampai teks ketentuan jelas.
-- Cakupan patokan 30% (seluruh kreditur atau per penyelenggara); label "patokan", bukan "batas hukum".
+Hal bertanda PERLU DATA di PRD v4 yang belum bisa diputuskan kode:
+
 - Daftar akhir tujuh kategori klausul dan penjelasannya (penasihat hukum).
 - Ambang kartu lembut dan daftar kata pemicu bahaya diri (psikolog klinis). Daftar kata sementara di `frontend/src/lib/keselamatan.ts` dan `backend/app/keselamatan.py` sengaja gagal-aman.
 - Nomor darurat 112 dan seluruh kontak diverifikasi ulang sebelum rilis.

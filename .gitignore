@@ -27,3 +27,4 @@ frontend/playwright-report/
 
 # Konfigurasi lokal alat pengembangan
 .claude/
+*.tsbuildinfo

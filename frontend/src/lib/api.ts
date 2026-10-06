@@ -60,7 +60,7 @@ function keBody(m: Masukan) {
     admin_persen: m.adminPersen,
     penghasilan: m.penghasilan ?? null,
     cicilan_lain: m.cicilanLain ?? 0,
-    segmen: m.segmen ?? "konsumtif_mikro",
+    segmen: m.segmen ?? "konsumtif",
   };
 }
 

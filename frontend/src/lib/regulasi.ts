@@ -3,10 +3,16 @@
  * Setiap parameter membawa sumber dan status. Parameter tanpa sumber tidak dipakai.
  */
 import berkas from "@shared/regulasi.json";
+import { rupiah } from "./format";
 
 export type StatusParameter = "terverifikasi" | "asumsi" | "perlu_data" | "nonaktif";
 export type JenisPinjaman = "konsumtif" | "produktif";
-export type IdSegmen = "konsumtif_mikro" | "konsumtif_kecil" | "produktif";
+export type IdSegmen = "konsumtif" | "produktif";
+
+/** Id segmen lama (versi 2026.10.1) yang mungkin masih tersimpan di perangkat. */
+export function normalSegmen(s: unknown): IdSegmen {
+  return s === "produktif" ? "produktif" : "konsumtif";
+}
 
 export interface Segmen {
   id: IdSegmen;
@@ -17,6 +23,8 @@ export interface Segmen {
 export interface BarisBatasHarian {
   id: string;
   segmen: IdSegmen | "semua";
+  /** Batas atas nilai pinjaman untuk baris ini (rupiah); kosong: semua nilai. */
+  pokok_maks?: number | null;
   tenor_maks_hari: number | null;
   persen?: number;
   persen_min?: number;
@@ -35,6 +43,8 @@ export interface VersiRegulasi {
   segmen: Segmen[];
   batas_harian: BarisBatasHarian[];
   admin_termasuk_batas: { nilai: boolean | null; sumber: string; status: StatusParameter; catatan: string };
+  /** Batas seluruh manfaat ekonomi dan denda terhadap nilai pinjaman. */
+  batas_total?: { persen: number; sumber: string; status: StatusParameter; catatan: string };
   patokan_rasio: { persen: number; sumber: string; status: StatusParameter; cakupan_status: StatusParameter; catatan: string };
   nonaktif: { nama: string; alasan: string }[];
 }
@@ -98,9 +108,13 @@ export type BatasHarian =
   | { tipe: "tunggal"; persen: number; baris: BarisBatasHarian }
   | { tipe: "rentang"; min: number; maks: number; baris: BarisBatasHarian };
 
-export function batasHarianUntuk(reg: VersiRegulasi, segmen: IdSegmen, tenor: number): BatasHarian {
+export function batasHarianUntuk(reg: VersiRegulasi, segmen: IdSegmen, tenor: number, pokok = 0): BatasHarian {
   const cocok = reg.batas_harian.find(
-    (b) => b.status !== "nonaktif" && (b.segmen === segmen || b.segmen === "semua") && (b.tenor_maks_hari === null || tenor <= b.tenor_maks_hari),
+    (b) =>
+      b.status !== "nonaktif" &&
+      (b.segmen === segmen || b.segmen === "semua") &&
+      (b.pokok_maks == null || pokok <= b.pokok_maks) &&
+      (b.tenor_maks_hari === null || tenor <= b.tenor_maks_hari),
   );
   const baris = cocok ?? reg.batas_harian[reg.batas_harian.length - 1];
   if (baris.persen !== undefined) return { tipe: "tunggal", persen: baris.persen, baris };
@@ -108,6 +122,28 @@ export function batasHarianUntuk(reg: VersiRegulasi, segmen: IdSegmen, tenor: nu
 }
 
 export const segmenUntuk = (reg: VersiRegulasi, id: IdSegmen) => reg.segmen.find((s) => s.id === id) ?? reg.segmen[0];
+
+/** Admin dihitung dalam batas harian? Bila belum pasti, RAMBU menampilkan dua angka (CEK-07). */
+export const adminTermasuk = (reg: VersiRegulasi) => reg.admin_termasuk_batas.nilai === true;
+
+/** "Konsumtif, tenor sampai 6 bulan", "Produktif di atas Rp50.000.000, semua tenor", dst. */
+export function labelBaris(reg: VersiRegulasi, b: BarisBatasHarian): string {
+  const seg = b.segmen === "semua" ? "Semua jenis" : (reg.segmen.find((s) => s.id === b.segmen)?.label.split(" (")[0] ?? b.segmen);
+  const sebelum = reg.batas_harian.slice(0, reg.batas_harian.indexOf(b)).filter((x) => x.segmen === b.segmen);
+  const plafonSebelum = Math.max(0, ...sebelum.map((x) => x.pokok_maks ?? 0));
+  const nilai = b.pokok_maks != null ? ` sampai ${rupiah(b.pokok_maks)}` : plafonSebelum ? ` di atas ${rupiah(plafonSebelum)}` : "";
+  const adaPendek = sebelum.some((x) => (x.pokok_maks ?? null) === (b.pokok_maks ?? null) && x.tenor_maks_hari !== null);
+  const tenor = b.tenor_maks_hari !== null ? `tenor sampai ${Math.round(b.tenor_maks_hari / 30)} bulan` : adaPendek ? "tenor lebih dari 6 bulan" : "semua tenor";
+  return `${seg}${nilai}, ${tenor}`;
+}
+
+/** Keterangan singkat patokan rasio, mengikuti status cakupannya di versi parameter. */
+export function teksPatokan(reg: VersiRegulasi): string {
+  const p = reg.patokan_rasio;
+  return p.cakupan_status === "terverifikasi"
+    ? `Patokan ${p.persen}% adalah batas yang dipakai penyelenggara saat menilai kemampuan bayar, dihitung dari cicilan ke seluruh kreditur (${p.sumber.replace(/ Romawi.*$/, "")}).`
+    : `Patokan ${p.persen}%, bukan batas hukum. Cakupannya (seluruh kreditur atau per penyelenggara) masih diverifikasi.`;
+}
 
 /** Tenor terpanjang untuk baris batas tunggal (dipakai di teks "tenor sampai 180 hari"). */
 export function ambangTenor(reg: VersiRegulasi): number {

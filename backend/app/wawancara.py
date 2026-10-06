@@ -176,7 +176,7 @@ def _konteks(daftar: list[Kewajiban], penghasilan: float | None, cicilan_penawar
         "KONTEKS:\n"
         f"- penghasilan per bulan: {rupiah(penghasilan) if penghasilan else 'belum diisi'}\n"
         f"- cicilan per bulan dari penawaran yang sedang dicek: {rupiah(cicilan_penawaran)}\n"
-        f"- patokan rasio cicilan (bukan batas hukum): {persen(versi_aktif().patokan_rasio_persen, 0)}\n"
+        f"- patokan rasio cicilan ke seluruh kreditur (batas penilaian penyelenggara, SEOJK 19/SEOJK.06/2025): {persen(versi_aktif().patokan_rasio_persen, 0)}\n"
         "DAFTAR_SAAT_INI:\n" + "\n".join(baris)
     )
 

@@ -3,7 +3,7 @@ import golden from "@shared/golden.json";
 import { hitung, kontrafaktual, kontrastifPenawaran, kontrastifRasio, ujiTekanan, type Masukan } from "./engine";
 import { penjelasanTemplat } from "./explain";
 import { bersihkanDesimal, parseDesimal, parseRupiah, persen, rupiah, rupiahKata, tampilRupiah } from "./format";
-import { versiAktif, type IdSegmen } from "./regulasi";
+import { semuaVersi, versiAktif, type IdSegmen } from "./regulasi";
 import { telusur } from "./telusur";
 
 const REG = versiAktif(golden.tanggal_acuan);
@@ -25,7 +25,7 @@ const keMasukan = (d: MasukanJson): Masukan => ({
   adminPersen: d.admin_persen,
   penghasilan: d.penghasilan,
   cicilanLain: d.cicilan_lain,
-  segmen: (d.segmen as IdSegmen) ?? "konsumtif_mikro",
+  segmen: (d.segmen as IdSegmen) ?? "konsumtif",
 });
 
 const kasus = (nama: string) => keMasukan(golden.kasus.find((k) => k.nama === nama)!.masukan);
@@ -46,6 +46,7 @@ function nilaiDari(h: NonNullable<ReturnType<typeof hitung>>, k: string): unknow
     status_batas: h.statusBatas,
     batas_tipe: h.batas.tipe,
     batas_persen: h.batas.tipe === "tunggal" ? h.batas.persen : null,
+    di_atas_batas_total: h.diAtasBatasTotal,
   };
   if (!(k in peta)) throw new Error(`kunci golden tidak dikenal: ${k}`);
   return peta[k];
@@ -72,7 +73,7 @@ describe("uji acuan PRD v4 (golden A/B/C)", () => {
       expect(persen(h.rasioSendiriPersen!, 1)).toBe(k.tampilan.rasio_sendiri);
       expect(persen(h.rasioPersen!, 1)).toBe(k.tampilan.rasio);
       expect(persen(h.efektifHarianPersen, 3)).toBe(k.tampilan.efektif);
-      expect(h.versiParameter).toBe("2026.10.1");
+      expect(h.versiParameter).toBe(golden.versi_acuan);
     });
   }
 
@@ -84,7 +85,8 @@ describe("uji acuan PRD v4 (golden A/B/C)", () => {
 describe("kasus tepi", () => {
   for (const k of golden.tepi) {
     it(k.nama, () => {
-      const h = hitung(keMasukan(k.masukan as MasukanJson), REG);
+      const versi = (k as { versi?: string }).versi;
+      const h = hitung(keMasukan(k.masukan as MasukanJson), versi ? semuaVersi.find((v) => v.id === versi)! : REG);
       if (k.harapan === null) expect(h).toBeNull();
       else cocok(h!, k.harapan as Record<string, unknown>);
     });
@@ -235,7 +237,7 @@ describe("penjelasan templat", () => {
     expect(teks).toContain("Rp3.810.000");
     expect(teks).toContain("39,3%");
     expect(teks).toContain("patokan 30%");
-    expect(teks).toContain("di atas batas jika admin dihitung");
+    expect(teks).toContain("Biaya efektif, termasuk admin, di atas batas 0,3% per hari");
     expect(teks).not.toMatch(/melanggar/);
   });
 });

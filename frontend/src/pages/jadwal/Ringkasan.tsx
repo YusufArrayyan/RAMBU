@@ -6,7 +6,7 @@ import { Halaman } from "@/components/Shell";
 import { Kartu, Lencana } from "@/components/ui";
 import { angka, persen, rupiah } from "@/lib/format";
 import { BULAN_PANJANG, hariIni, kontrastifBulan, ringkasanBeberapaBulan } from "@/lib/jadwal";
-import { versiAktif } from "@/lib/regulasi";
+import { teksPatokan, versiAktif } from "@/lib/regulasi";
 import { useApp } from "@/state/app";
 import { NavJadwal } from "./Kalender";
 
@@ -126,7 +126,7 @@ export default function Ringkasan() {
                 <p className="text-ink">Enam bulan ke depan semua bulan berada dalam patokan {L}%.</p>
               </Kartu>
             )}
-            <p className="text-sm text-muted">Patokan {L}% mengacu pada pemberitaan; cakupannya (total atau per penyelenggara) masih diverifikasi.</p>
+            <p className="text-sm text-muted">{teksPatokan(versiAktif())}</p>
           </div>
         </div>
       )}

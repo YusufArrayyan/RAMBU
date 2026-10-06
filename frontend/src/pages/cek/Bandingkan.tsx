@@ -91,7 +91,7 @@ export default function Bandingkan() {
     { label: "Biaya (Rp)", nilai: (p) => (p.hasil ? angka(p.hasil.biaya) : "-") },
     { label: "Cicilan (Rp)", nilai: (p) => (p.hasil ? angka(p.hasil.cicilan) : "-") },
     { label: "Rasio*", nilai: (p) => (p.hasil?.rasioPersen != null ? persen(p.hasil.rasioPersen) : "-"), nada: (p) => !!p.hasil?.diAtasPatokan },
-    { label: "Efektif per hari", nilai: (p) => (p.hasil ? persen(p.hasil.efektifHarianPersen, 2) : "-"), nada: (p) => !!p.hasil && p.hasil.statusBatas !== "bawah_keduanya" && p.hasil.statusBatas !== "belum_pasti" },
+    { label: "Efektif per hari", nilai: (p) => (p.hasil ? persen(p.hasil.efektifHarianPersen, 2) : "-"), nada: (p) => !!p.hasil && ["atas_batas", "atas_bunga", "atas_jika_admin"].includes(p.hasil.statusBatas) },
   ];
 
   return (
@@ -128,7 +128,7 @@ export default function Bandingkan() {
                 <span className="sr-only">Besaran</span>
               </th>
               {dihitung.map((p) => {
-                const melebihi = p.hasil && (p.hasil.statusBatas === "atas_bunga" || p.hasil.statusBatas === "atas_jika_admin");
+                const melebihi = p.hasil && ["atas_batas", "atas_bunga", "atas_jika_admin"].includes(p.hasil.statusBatas);
                 return (
                   <th key={p.id} scope="col" className={cx("px-2 pt-4 pb-2 text-center align-bottom", p.id === alur.terpilih && "bg-tint")}>
                     <span className="flex items-center justify-center gap-0.5">

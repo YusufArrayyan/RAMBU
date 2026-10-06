@@ -4,6 +4,7 @@
  */
 import type { Hasil, Masukan } from "./engine";
 import { angka, persen, rupiah } from "./format";
+import { teksPatokan, versiAktif } from "./regulasi";
 
 export type Besaran = "diterima" | "total" | "biaya" | "cicilan" | "rasio" | "efektif";
 
@@ -62,7 +63,7 @@ export function telusur(besaran: Besaran, m: Masukan, h: Hasil): Telusur | null 
         judul: "Rasio terhadap penghasilan",
         rumus: "rasio = (cicilan + K) ÷ I",
         langkah: [`= (${a(h.cicilan)} + ${a(K)}) ÷ ${a(I)}`, `= ${a(h.cicilan + K)} ÷ ${a(I)}`, `= ${persen(h.rasioPersen, 1)}`],
-        keterangan: `K = cicilan lain per bulan, I = penghasilan per bulan. Patokan ${persen(h.patokanPersen, 0)} adalah patokan, bukan batas hukum. Versi parameter ${h.versiParameter}.`,
+        keterangan: `K = cicilan lain per bulan, I = penghasilan per bulan. ${teksPatokan(versiAktif())} Versi parameter ${h.versiParameter}.`,
       };
     case "efektif":
       return {

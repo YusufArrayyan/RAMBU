@@ -10,6 +10,10 @@ export function kalimatBatas(h: Hasil): string {
   const b = h.batas;
   const teksBatas = b.tipe === "tunggal" ? persen(b.persen, 3) : `${persen(b.min, 1)} sampai ${persen(b.maks, 1)}`;
   switch (h.statusBatas) {
+    case "bawah_batas":
+      return `Biaya efektif, termasuk admin, di bawah batas ${teksBatas} per hari (perkiraan).`;
+    case "atas_batas":
+      return `Biaya efektif, termasuk admin, di atas batas ${teksBatas} per hari (perkiraan).`;
     case "bawah_keduanya":
       return `Di bawah batas ${teksBatas} per hari, dengan dan tanpa admin (perkiraan).`;
     case "atas_jika_admin":

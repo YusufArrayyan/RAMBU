@@ -24,7 +24,7 @@ class Masukan:
     admin_persen: float  # a x 100
     penghasilan: float | None = None  # I, rupiah per bulan
     cicilan_lain: float = 0  # K, rupiah per bulan
-    segmen: str = "konsumtif_mikro"
+    segmen: str = "konsumtif"
 
 
 @dataclass(frozen=True)
@@ -48,6 +48,8 @@ class Hasil:
     batas_min: float | None
     batas_maks: float | None
     status_batas: str
+    batas_total_persen: float | None
+    di_atas_batas_total: bool | None
     versi_parameter: str
 
     def as_dict(self) -> dict:
@@ -74,8 +76,10 @@ def jumlah_cicilan_untuk(tenor: int) -> int:
     return max(1, math.ceil(tenor / 30))
 
 
-def posisi_batas(bunga_harian: Decimal, efektif: Decimal, b: Batas) -> str:
-    """Dua angka sampai cakupan admin pada batas harian jelas (CEK-07)."""
+def posisi_batas(bunga_harian: Decimal, efektif: Decimal, b: Batas, dengan_admin: bool = False) -> str:
+    """Admin termasuk batas: bandingkan biaya efektif. Belum pasti: dua angka (CEK-07)."""
+    if dengan_admin and b.tipe == "tunggal":
+        return "atas_batas" if efektif > _d(b.persen) + EPS else "bawah_batas"
     if b.tipe == "tunggal":
         batas = _d(b.persen)
         if bunga_harian > batas + EPS:
@@ -117,7 +121,8 @@ def hitung(m: Masukan, regulasi: VersiRegulasi | None = None) -> Hasil | None:
     rasio = (cicilan + K) / I * 100 if I else None
     efektif = biaya / (P * T) * 100
     L = _d(reg.patokan_rasio_persen)
-    b = reg.batas_harian_untuk(m.segmen, T)
+    b = reg.batas_harian_untuk(m.segmen, T, float(P))
+    batas_total = reg.batas_total_persen
 
     return Hasil(
         bunga=float(bunga),
@@ -138,7 +143,9 @@ def hitung(m: Masukan, regulasi: VersiRegulasi | None = None) -> Hasil | None:
         batas_persen=b.persen,
         batas_min=b.min,
         batas_maks=b.maks,
-        status_batas=posisi_batas(_d(m.bunga_harian_persen), efektif, b),
+        status_batas=posisi_batas(_d(m.bunga_harian_persen), efektif, b, reg.admin_termasuk),
+        batas_total_persen=batas_total,
+        di_atas_batas_total=None if batas_total is None else biaya / P * 100 > _d(batas_total) + EPS,
         versi_parameter=reg.id,
     )
 

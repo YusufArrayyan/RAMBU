@@ -5,7 +5,7 @@ import { Halaman } from "@/components/Shell";
 import { Kartu, Lencana } from "@/components/ui";
 import { persen } from "@/lib/format";
 import { tglPanjang } from "@/lib/jadwal";
-import { LABEL_STATUS, versiAktif, type StatusParameter } from "@/lib/regulasi";
+import { LABEL_STATUS, adminTermasuk, labelBaris, versiAktif, type StatusParameter } from "@/lib/regulasi";
 
 function Status({ s }: { s: StatusParameter }) {
   const nada = s === "terverifikasi" ? "teal" : s === "nonaktif" ? "netral" : "amber";
@@ -14,8 +14,6 @@ function Status({ s }: { s: StatusParameter }) {
 
 export default function CaraHitung() {
   const reg = versiAktif();
-  const maks6 = reg.batas_harian.filter((b) => b.tenor_maks_hari !== null);
-  const lebih6 = reg.batas_harian.find((b) => b.tenor_maks_hari === null);
   return (
     <Halaman judul="Cara RAMBU menghitung" kembali={true} lebar="lebar">
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start lg:gap-6">
@@ -35,43 +33,42 @@ export default function CaraHitung() {
 
           <Kartu aria-labelledby="batas">
             <h2 id="batas" className="t-h2">
-              Batas bunga harian (OJK, tenor sampai 6 bulan)
+              Batas biaya harian (OJK)
             </h2>
             <ul className="mt-2 divide-y divide-line">
-              {maks6.map((b) => (
+              {reg.batas_harian.map((b) => (
                 <li key={b.id} className="flex items-start justify-between gap-3 py-3">
                   <div>
-                    <p className="font-semibold text-ink">{reg.segmen.find((s) => s.id === b.segmen)?.label}</p>
+                    <p className="font-semibold text-ink">{labelBaris(reg, b)}</p>
                     <p className="text-sm text-muted">{b.sumber}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="angka text-lg font-bold text-ink">{persen(b.persen!, 3)}</span>
+                    <span className="angka text-lg font-bold text-ink">
+                      {b.persen != null ? persen(b.persen, 3) : `${persen(b.persen_min!, 1)}–${persen(b.persen_maks!, 1)}`}
+                    </span>
                     <Status s={b.status} />
                   </div>
                 </li>
               ))}
-              {lebih6 && (
-                <li className="flex items-start justify-between gap-3 py-3">
-                  <div>
-                    <p className="font-semibold text-ink">Tenor lebih dari 6 bulan</p>
-                    <p className="text-sm text-muted">{lebih6.sumber}</p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="angka text-lg font-bold text-ink">
-                      {persen(lebih6.persen_min!, 1)}–{persen(lebih6.persen_maks!, 1)}
-                    </span>
-                    <Status s={lebih6.status} />
-                  </div>
-                </li>
-              )}
             </ul>
             <div className="mt-2 rounded-xl bg-sunken p-3">
               <div className="flex items-start justify-between gap-3">
-                <p className="font-semibold text-ink">Apakah batas harian termasuk admin?</p>
+                <p className="font-semibold text-ink">{adminTermasuk(reg) ? "Admin termasuk dalam batas" : "Apakah batas harian termasuk admin?"}</p>
                 <Status s={reg.admin_termasuk_batas.status} />
               </div>
               <p className="mt-1 text-sm text-text2">{reg.admin_termasuk_batas.catatan}</p>
             </div>
+            {reg.batas_total && (
+              <div className="mt-2 rounded-xl bg-sunken p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-semibold text-ink">Batas total {persen(reg.batas_total.persen, 0)} dari pinjaman</p>
+                  <Status s={reg.batas_total.status} />
+                </div>
+                <p className="mt-1 text-sm text-text2">
+                  {reg.batas_total.catatan} Sumber: {reg.batas_total.sumber}.
+                </p>
+              </div>
+            )}
           </Kartu>
 
           <Kartu aria-labelledby="patokan">
@@ -84,6 +81,7 @@ export default function CaraHitung() {
             <p className="mt-1.5 text-text2">
               Mengacu pada {reg.patokan_rasio.sumber}. {reg.patokan_rasio.catatan}
             </p>
+            <p className="mt-1.5 text-sm text-muted">Batas ini mengikat penyelenggara saat menilai pengajuan. RAMBU memakainya sebagai patokan untuk melihat beban seluruh cicilanmu.</p>
             <div className="mt-2 flex items-center gap-2 text-sm">
               <span className="text-text2">Cakupan:</span>
               <Status s={reg.patokan_rasio.cakupan_status} />

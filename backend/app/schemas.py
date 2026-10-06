@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, model_validator
+
+from .regulasi import normal_segmen
 
 
 class MasukanIn(BaseModel):
@@ -14,7 +16,8 @@ class MasukanIn(BaseModel):
     admin_persen: float = Field(ge=0, lt=100)
     penghasilan: float | None = Field(default=None, ge=0, le=1_000_000_000_000)
     cicilan_lain: float = Field(default=0, ge=0, le=1_000_000_000_000)
-    segmen: Literal["konsumtif_mikro", "konsumtif_kecil", "produktif"] = "konsumtif_mikro"
+    # Id lama (konsumtif_mikro, konsumtif_kecil) dari perangkat yang belum diperbarui diterima sebagai konsumtif.
+    segmen: Annotated[Literal["konsumtif", "produktif"], BeforeValidator(normal_segmen)] = "konsumtif"
 
 
 # Kamus event analitik PRD v4 16.2: daftar lengkap yang diizinkan, dengan properti kategori
@@ -23,7 +26,7 @@ PROPERTI_EVENT: dict[str, dict[str, set[str] | None]] = {
     "app_open": {"mode": {"tamu", "akun"}},
     "onboarding_mode_selected": {"mode": {"tamu", "akun"}},
     "profile_saved": {"has_income": {"ya", "tidak"}},
-    "offer_calculated": {"input_method": {"manual", "tempel"}, "segmen": {"konsumtif_mikro", "konsumtif_kecil", "produktif"}},
+    "offer_calculated": {"input_method": {"manual", "tempel"}, "segmen": {"konsumtif", "produktif"}},
     "telusur_opened": {"besaran": {"diterima", "total", "biaya", "cicilan", "rasio", "efektif"}},
     "kontrastif_viewed": {},
     "kontrafaktual_viewed": {"variabel": {"pokok", "cicilan_lain", "penghasilan", "ruang"}},

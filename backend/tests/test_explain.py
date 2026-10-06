@@ -13,7 +13,7 @@ RESMI = angka_resmi(M, H)
 def test_templat_lolos_pemeriksa_sendiri():
     teks = penjelasan_templat(M, H)
     assert "Rp2.850.000" in teks and "Rp3.810.000" in teks and "39,3%" in teks
-    assert "patokan 30%" in teks and "jika admin dihitung" in teks
+    assert "patokan 30%" in teks and "termasuk admin, di atas batas 0,3%" in teks
     assert "melanggar" not in teks
     hasil = periksa(teks, RESMI)
     assert hasil.lolos, hasil.alasan
